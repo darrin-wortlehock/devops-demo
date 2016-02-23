@@ -1,0 +1,1 @@
+${element(split(".", ipv4),3)}.${element(split(".", ipv4),2)}.${element(split(".", ipv4),1)}.${element(split(".", ipv4),0)}.in-addr.arpa.
