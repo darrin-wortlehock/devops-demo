@@ -1,3 +1,41 @@
+resource "aws_security_group" "openvpn" {
+  name = "openvpn"
+  description = "Allow OpenVPN access"
+  vpc_id = "${aws_vpc.devops-demo.id}"
+  # OpenVPN (tcp/443)
+  ingress = {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  # OpenVPN (udp/1194)
+  ingress = {
+    from_port = 1194
+    to_port = 1194
+    protocol = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "openvpn"
+  }
+}
+
+resource "aws_security_group" "gocd-server" {
+  name = "gocd-server"
+  description = "Allow GO CD web UI"
+  vpc_id = "${aws_vpc.devops-demo.id}"
+  ingress {
+    from_port = 8153
+    to_port = 8153
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "gocd-server"
+  }
+}
+
 resource "template_file" "ops-userdata" {
   template = "${file("ops-userdata.tpl")}"
   vars {
@@ -20,7 +58,9 @@ resource "aws_instance" "ops" {
   key_name = "devops-key"
   vpc_security_group_ids = [
     "${aws_security_group.public_egress.id}",
-    "${aws_security_group.allow_ssh.id}"
+    "${aws_security_group.allow_ssh.id}",
+    "${aws_security_group.openvpn.id}",
+    "${aws_security_group.gocd-server.id}"
   ]
   tags {
     Name = "devops-demo-ops"
