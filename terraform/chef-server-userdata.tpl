@@ -25,6 +25,7 @@ runcmd:
   - su - -c 'chef-server-ctl install opscode-reporting'
   - su - -c 'chef-server-ctl reconfigure'
   - su - -c 'opscode-reporting-ctl reconfigure'
+  - aws s3 cp /var/opt/opscode/nginx/ca/chef-server.internal.devops-demo.co.uk.crt s3://${secrets_bucket}/ --region=${aws_region}
   - aws s3 cp /tmp/admin.pem s3://${secrets_bucket}/ --region=${aws_region}
   - aws s3 cp /tmp/devops-demo-validator.pem s3://${secrets_bucket}/ --region=${aws_region}
   - echo "Finished"
