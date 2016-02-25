@@ -16,6 +16,14 @@ bootcmd:
 
 preserve_hostname: true
 
+write_files:
+ - path: /etc/chef/client.rb
+   content: |
+     log_level :info
+     log_location STDOUT
+     chef_server_url 'http://chef-server.internal.devops-demo.com.uk'
+     validation_client_name 'devops-demo-validator'
+
 runcmd:
  - curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh | sudo bash
  - apt-get -y -qq install chefdk
