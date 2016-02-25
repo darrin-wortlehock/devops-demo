@@ -4,19 +4,33 @@ variable "aws_secret_access_key" {}
 variable "aws_devops_public_key" {}
 
 variable "aws_region" {
-  default = "eu-west-1"
+  default = "us-east-1"
 }
 
-variable "chef_server_user_name" {
+variable "chef_server_admin_user_name" {
   default = "admin"
 }
-variable "chef_server_user_full_name" {
+variable "chef_server_admin_user_full_name" {
   default = "Administrative User"
 }
-variable "chef_server_user_email" {
-  default = "admin@example.com"
+variable "chef_server_admin_user_email" {
+  default = "admin@devops-demo.co.uk"
 }
-variable "chef_server_user_password" {}
+variable "chef_server_admin_user_password" {}
+
+variable "chef_server_deploy_user_name" {
+  default = "deploy"
+}
+
+variable "chef_server_deploy_user_full_name" {
+  default = "Deploy User"
+}
+
+variable "chef_server_deploy_user_email" {
+  default = "deploy@devops-demo.co.uk"
+}
+
+variable "chef_server_deploy_user_password" {}
 
 variable "chef_server_org_name" {
   default = "devops-demo"

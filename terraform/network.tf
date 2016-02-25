@@ -16,7 +16,7 @@ resource "aws_internet_gateway" "gateway" {
 
 resource "aws_subnet" "public" {
   vpc_id = "${aws_vpc.devops-demo.id}"
-  availability_zone = "eu-west-1a"
+  availability_zone = "${var.aws_region}a"
   cidr_block = "10.0.0.0/24"
   map_public_ip_on_launch = true
   tags {
@@ -69,7 +69,7 @@ resource "aws_security_group" "public_egress" {
 }
 
 resource "aws_s3_bucket" "devops-demo-secrets" {
-  bucket = "devops-demo-secrets"
+  bucket = "${format("devops-demo-secrets-%s", aws_vpc.devops-demo.id)}"
   acl = "private"
   force_destroy = true
   tags {
@@ -128,7 +128,7 @@ resource "aws_iam_policy" "secrets_s3_write_access_policy" {
         "s3:DeleteObject"
       ],
       "Resource": [
-        "arn:aws:s3:::devops-demo-secrets/*"
+        "${aws_s3_bucket.devops-demo-secrets.arn}/*"
       ]
     }
   ]
@@ -148,7 +148,7 @@ resource "aws_iam_policy" "secrets_s3_read_access_policy" {
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::devops-demo-secrets"
+        "${aws_s3_bucket.devops-demo-secrets.arn}"
       ]
     },
     {
@@ -157,7 +157,7 @@ resource "aws_iam_policy" "secrets_s3_read_access_policy" {
         "s3:GetObject"
       ],
       "Resource": [
-        "arn:aws:s3:::devops-demo-secrets/*"
+        "${aws_s3_bucket.devops-demo-secrets.arn}/*"
       ]
     }
   ]
@@ -184,6 +184,7 @@ resource "aws_iam_policy_attachment" "secrets_s3_write_access_roles" {
 
 resource "aws_iam_instance_profile" "secrets_read_only" {
   name = "secrets_read_only_instance_profile"
+  depends_on = ["aws_iam_policy_attachment.secrets_s3_read_access_roles"]
   roles = [
     "${aws_iam_role.secrets_read_only_role.id}"
   ]
@@ -192,6 +193,7 @@ resource "aws_iam_instance_profile" "secrets_read_only" {
 
 resource "aws_iam_instance_profile" "secrets_read_write" {
   name = "secrets_read_write_instance_profile"
+  depends_on = ["aws_iam_policy_attachment.secrets_s3_read_access_roles", "aws_iam_policy_attachment.secrets_s3_write_access_roles"]
   roles = [
     "${aws_iam_role.secrets_read_write_role.id}"
   ]

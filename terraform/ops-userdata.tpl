@@ -37,5 +37,6 @@ runcmd:
  - until aws s3 ls s3://${secrets_bucket} --region=${aws_region} | grep -q "devops-demo-validator.pem"; do echo "waiting for s3://${secrets_bucket}/devops-demo-validator.pem ..."; sleep 10; done;
  - aws s3 cp s3://${secrets_bucket}/devops-demo-validator.pem /etc/chef/validation.pem --region=${aws_region}
  - aws s3 cp s3://${secrets_bucket}/chef-server.internal.devops-demo.co.uk.crt /etc/chef/trusted_certs/ --region=${aws_region}
+ - aws s3 cp s3://${secrets_bucket}/deploy.pem /etc/chef/deploy.pem --region=${aws_region}
  - chef-client
  - echo "Finished."
