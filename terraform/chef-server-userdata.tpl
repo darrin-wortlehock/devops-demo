@@ -18,7 +18,7 @@ runcmd:
   - su - -c 'apt-get -y -qq install chef-server-core'
   - su - -c 'chef-server-ctl reconfigure'
   - su - -c 'chef-server-ctl user-create ${chef_admin_user_name} ${chef_admin_user_full_name} ${chef_admin_user_email} ${chef_admin_user_password} --filename /tmp/admin.pem'
-  - su - -c 'chef-server-ctl org-create ${chef_org_name} ${chef_org_full_name} --association_user ${chef_user_name} --filename /tmp/devops-demo-validator.pem'
+  - su - -c 'chef-server-ctl org-create ${chef_org_name} ${chef_org_full_name} --association_user ${chef_admin_user_name} --filename /tmp/devops-demo-validator.pem'
   - su - -c 'chef-server-ctl user-create ${chef_deploy_user_name} ${chef_deploy_user_full_name} ${chef_deploy_user_email} ${chef_deploy_user_password} --filename /tmp/deploy.pem'
   - su - -c 'chef-server-ctl install opscode-manage'
   - su - -c 'chef-server-ctl reconfigure'
