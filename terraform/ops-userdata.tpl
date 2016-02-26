@@ -81,5 +81,5 @@ runcmd:
  - echo ######## Uploading Cookbooks ########
  - sudo -u ubuntu berks upload
  - echo ######## Converging Node ########
- - chef-client -d -j /etc/chef/first-boot.json
+ - chef-client -j /etc/chef/first-boot.json
  - echo ######## Finished Provisioning ########
