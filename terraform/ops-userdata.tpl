@@ -24,6 +24,20 @@ write_files:
      chef_server_url 'https://chef-server.internal.devops-demo.co.uk/organizations/devops-demo'
      validation_client_name 'devops-demo-validator'
 
+ - path: /var/go/.berkshelf/config.json
+   content: |
+     {
+       "ssl": {
+         "verify": false
+       }
+     }
+
+ - path: /var/go/.chef/config.rb
+   content: |
+     chef_server_url 'https://chef-server.internal.devops-demo.co.uk/organizations/devops-demo'
+     node_name 'deploy'
+     client_key '/etc/chef/deploy.pem'
+
 runcmd:
  - curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh | sudo bash
  - apt-get -y -qq install chefdk
