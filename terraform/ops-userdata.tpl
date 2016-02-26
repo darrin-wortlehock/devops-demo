@@ -17,14 +17,15 @@ bootcmd:
 preserve_hostname: true
 
 write_files:
- - path: /etc/chef/client.rb
+ - path: /home/ubuntu/.chef/config.rb
    content: |
      log_level :info
-     log_location STDOUT
+     log_location :STDOUT
      chef_server_url 'https://chef-server.internal.devops-demo.co.uk/organizations/devops-demo'
-     validation_client_name 'devops-demo-validator'
+     node_name 'deploy'
+     client_key '/home/ubuntu/.chef/deploy.pem'
 
- - path: /var/go/.berkshelf/config.json
+ - path: /home/ubuntu/.berkshelf/config.json
    content: |
      {
        "ssl": {
@@ -32,25 +33,36 @@ write_files:
        }
      }
 
- - path: /var/go/.chef/config.rb
+ - path: /home/ubuntu/chef-repo/Berksfile
+   content |
+     source 'https://supermarket.chef.io'
+
+     cookbook 'devops-demo', github: 'darrin-wortlehock/devops-demo-cookbook'
+     cookbook 'gocd', github: 'darrin-wortlehock/go-cookbook', branch: 'fix-missing-metadata' # rubocop:disable Metrics/LineLength
+
+ - path: /etc/chef/client.rb
    content: |
+     log_level :info
+     log_location STDOUT
      chef_server_url 'https://chef-server.internal.devops-demo.co.uk/organizations/devops-demo'
-     node_name 'deploy'
-     client_key '/etc/chef/deploy.pem'
+     validation_client_name 'devops-demo-validator'
 
 runcmd:
+ - echo ######## Installing ChefDK ########
  - curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh | sudo bash
  - apt-get -y -qq install chefdk
- - mkdir /var/chef-solo
- - chown ubuntu /var/chef-solo
- - cd /var/chef-solo
- - sudo -u ubuntu git clone https://github.com/darrin-wortlehock/devops-demo.git
- - cd devops-demo
- - sudo -u ubuntu berks vendor cookbooks
- - chef-solo -c solo/solo.rb -j solo/ops.json
+ - echo ######## Creating Chef Repo  ########
+ - cd /home/ubuntu
+ - sudo -u ubuntu chef generate app chef-repo
+ - cd chef-repo
+ - sudo -u ubuntu berks install
+ - echo ######## Waiting For Chef Server ########
  - until aws s3 ls s3://${secrets_bucket} --region=${aws_region} | grep -q "devops-demo-validator.pem"; do echo "waiting for s3://${secrets_bucket}/devops-demo-validator.pem ..."; sleep 10; done;
  - aws s3 cp s3://${secrets_bucket}/devops-demo-validator.pem /etc/chef/validation.pem --region=${aws_region}
  - aws s3 cp s3://${secrets_bucket}/chef-server.internal.devops-demo.co.uk.crt /etc/chef/trusted_certs/ --region=${aws_region}
- - aws s3 cp s3://${secrets_bucket}/deploy.pem /etc/chef/deploy.pem --region=${aws_region}
+ - aws s3 cp s3://${secrets_bucket}/deploy.pem /home/ubuntu/.chef/deploy.pem --region=${aws_region}
+ - echo ######## Uploading Cookbooks ########
+ - sudo -u ubuntu berks upload
+ - echo ######## Converging Node ########
  - chef-client
- - echo "Finished."
+ - echo ######## Finished Provisioning ########
