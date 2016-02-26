@@ -47,6 +47,15 @@ write_files:
      chef_server_url 'https://chef-server.internal.devops-demo.co.uk/organizations/devops-demo'
      validation_client_name 'devops-demo-validator'
 
+ - path: /etc/chef/first-boot.json
+   content: |
+     {
+       "run_list": [
+         "recipe[devops-demo::continuous_delivery]",
+         "recipe[devops-demo::openvpn]"
+       ]
+     }
+
 runcmd:
  - echo ######## Installing ChefDK ########
  - curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh | sudo bash
@@ -72,5 +81,5 @@ runcmd:
  - echo ######## Uploading Cookbooks ########
  - sudo -u ubuntu berks upload
  - echo ######## Converging Node ########
- - chef-client
+ - chef-client -d -j /etc/chef/first-boot.json
  - echo ######## Finished Provisioning ########

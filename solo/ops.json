@@ -1,6 +1,0 @@
-{
-  "run_list": [
-    "recipe[devops-demo::continuous_delivery]",
-    "recipe[devops-demo::openvpn]"
-  ]
-}
