@@ -34,7 +34,7 @@ write_files:
      }
 
  - path: /home/ubuntu/chef-repo/Berksfile
-   content |
+   content: |
      source 'https://supermarket.chef.io'
 
      cookbook 'devops-demo', github: 'darrin-wortlehock/devops-demo-cookbook'
