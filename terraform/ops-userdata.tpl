@@ -18,14 +18,16 @@ preserve_hostname: true
 
 write_files:
  - path: /home/ubuntu/.chef/config.rb
+   owner: ubuntu:ubuntu
    content: |
      log_level :info
-     log_location :STDOUT
+     log_location STDOUT
      chef_server_url 'https://chef-server.internal.devops-demo.co.uk/organizations/devops-demo'
      node_name 'deploy'
      client_key '/home/ubuntu/.chef/deploy.pem'
 
  - path: /home/ubuntu/.berkshelf/config.json
+   owner: ubuntu:ubuntu
    content: |
      {
        "ssl": {
@@ -34,6 +36,7 @@ write_files:
      }
 
  - path: /home/ubuntu/chef-repo/Berksfile
+   owner: ubuntu:ubuntu
    content: |
      source 'https://supermarket.chef.io'
 
