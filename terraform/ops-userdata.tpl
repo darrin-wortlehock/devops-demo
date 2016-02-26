@@ -56,6 +56,13 @@ write_files:
        ]
      }
 
+ - path: /tmp/aws_s3_bucket.devops-demo-secrets.json
+   content: |
+    {
+      "name": "${secrets_bucket}"
+    }
+
+
 runcmd:
  - echo ######## Installing ChefDK ########
  - curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh | sudo bash
@@ -68,6 +75,8 @@ runcmd:
  - sudo -u ubuntu mkdir .berkshelf
  - mv /tmp/config.json .berkshelf/
  - chown ubuntu:ubuntu .berkshelf/config.json
+ - mkdir -p /etc/chef/trusted_certs
+ - ln -s /etc/chef/trusted_certs .chef/trusted_certs
  - sudo -u ubuntu chef generate app chef-repo
  - cd chef-repo
  - mv /tmp/Berksfile .
@@ -80,6 +89,11 @@ runcmd:
  - aws s3 cp s3://${secrets_bucket}/deploy.pem /home/ubuntu/.chef/deploy.pem --region=${aws_region}
  - echo ######## Uploading Cookbooks ########
  - sudo -u ubuntu berks upload
+ - echo ######## Creating Data Bags ########
+ - sudo -u ubuntu mkdir -p data_bags/terraform
+ - mv /tmp/aws_s3_bucket.devops-demo-secrets.json data_bags/terraform/
+ - chown ubuntu:ubuntu data_bags/terraform/aws_s3_bucket.devops-demo-secrets.json
+ - sudo -u ubuntu knife data bag from file terraform
  - echo ######## Converging Node ########
  - chef-client -j /etc/chef/first-boot.json
  - echo ######## Finished Provisioning ########
