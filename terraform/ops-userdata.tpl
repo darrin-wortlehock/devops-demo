@@ -59,6 +59,7 @@ write_files:
  - path: /tmp/aws_s3_bucket.devops-demo-secrets.json
    content: |
     {
+      "id": "aws_s3_bucket.devops-demo-secrets",
       "name": "${secrets_bucket}"
     }
 
@@ -93,7 +94,7 @@ runcmd:
  - sudo -u ubuntu mkdir -p data_bags/terraform
  - mv /tmp/aws_s3_bucket.devops-demo-secrets.json data_bags/terraform/
  - chown ubuntu:ubuntu data_bags/terraform/aws_s3_bucket.devops-demo-secrets.json
- - sudo -u ubuntu knife data bag from file terraform
+ - sudo -u ubuntu knife data bag from file terraform data_bags/terraform/aws_s3_bucket.devops-demo-secrets.json
  - echo ######## Converging Node ########
  - chef-client -j /etc/chef/first-boot.json
  - echo ######## Finished Provisioning ########
