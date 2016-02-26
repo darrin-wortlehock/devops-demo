@@ -17,8 +17,7 @@ bootcmd:
 preserve_hostname: true
 
 write_files:
- - path: /home/ubuntu/.chef/config.rb
-   owner: ubuntu:ubuntu
+ - path: /tmp/config.rb
    content: |
      log_level :info
      log_location STDOUT
@@ -26,8 +25,7 @@ write_files:
      node_name 'deploy'
      client_key '/home/ubuntu/.chef/deploy.pem'
 
- - path: /home/ubuntu/.berkshelf/config.json
-   owner: ubuntu:ubuntu
+ - path: /tmp/config.json
    content: |
      {
        "ssl": {
@@ -35,8 +33,7 @@ write_files:
        }
      }
 
- - path: /home/ubuntu/chef-repo/Berksfile
-   owner: ubuntu:ubuntu
+ - path: /tmp/Berksfile
    content: |
      source 'https://supermarket.chef.io'
 
@@ -56,8 +53,16 @@ runcmd:
  - apt-get -y -qq install chefdk
  - echo ######## Creating Chef Repo  ########
  - cd /home/ubuntu
+ - sudo -u ubuntu mkdir .chef
+ - mv /tmp/config.rb .chef/
+ - chown ubuntu:ubuntu .chef/config.rb
+ - sudo -u ubuntu mkdir .berkshelf
+ - mv /tmp/config.json .berkshelf/
+ - chown ubuntu:ubuntu .berkshelf/config.json
  - sudo -u ubuntu chef generate app chef-repo
  - cd chef-repo
+ - mv /tmp/Berksfile .
+ - chown ubuntu:ubuntu Berksfile
  - sudo -u ubuntu berks install
  - echo ######## Waiting For Chef Server ########
  - until aws s3 ls s3://${secrets_bucket} --region=${aws_region} | grep -q "devops-demo-validator.pem"; do echo "waiting for s3://${secrets_bucket}/devops-demo-validator.pem ..."; sleep 10; done;
