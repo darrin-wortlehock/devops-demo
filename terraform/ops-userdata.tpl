@@ -60,7 +60,7 @@ write_files:
    content: |
     {
       "id": "aws_s3_bucket.devops-demo-secrets",
-      "name": "${secrets_bucket}"
+      "bucket": "${secrets_bucket}"
     }
 
 
