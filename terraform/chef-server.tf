@@ -83,3 +83,14 @@ resource "aws_route53_record" "chef-server-inverse" {
     "chef-server.${aws_route53_zone.internal.name}."
     ]
 }
+
+resource "aws_route53_record" "chef_server_public" {
+  count = "${replace(replace(replace(var.route53_public_hosted_zone_id, "/(?:none)|(.*)/", "$1"), "/^.+$/", "1"), "/$^/", "0")}"
+  zone_id = "${var.route53_public_hosted_zone_id}"
+  name = "chef-server"
+  type = "CNAME"
+  ttl = "60"
+  records = [
+    "${aws_instance.chef-server.public_dns}"
+  ]
+}

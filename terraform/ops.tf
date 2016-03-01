@@ -94,3 +94,14 @@ resource "aws_route53_record" "ops-inverse" {
     "ops.${aws_route53_zone.internal.name}."
   ]
 }
+
+resource "aws_route53_record" "ops_public" {
+  count = "${replace(replace(replace(var.route53_public_hosted_zone_id, "/(?:none)|(.*)/", "$1"), "/^.+$/", "1"), "/$^/", "0")}"
+  zone_id = "${var.route53_public_hosted_zone_id}"
+  name = "ops"
+  type = "CNAME"
+  ttl = "60"
+  records = [
+    "${aws_instance.ops.public_dns}"
+  ]
+}

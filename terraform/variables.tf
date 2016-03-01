@@ -3,6 +3,14 @@ variable "aws_secret_access_key" {}
 
 variable "aws_devops_public_key" {}
 
+variable "domain_name" {
+  default = "devops-demo.co.uk"
+}
+
+variable "route53_public_hosted_zone_id" {
+  default = "none"
+}
+
 variable "aws_region" {
   default = "us-east-1"
 }
